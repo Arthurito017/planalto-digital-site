@@ -30,4 +30,4 @@ Antes de publicar, preencha o número em `WHATSAPP`, no topo de `js/main.js`. Se
 
 ## Regra de conteúdo
 
-O portfólio só mostra clínicas fictícias, com esse rótulo visível, até existirem clientes reais com autorização. Não acrescente depoimentos ou números sem fonte.
+Os cases são projetos reais e só entram com autorização do cliente. Os projetos de antes e depois usam empresas fictícias, com esse rótulo visível. Não acrescente depoimentos ou números sem fonte. Imagens dos cases ficam em `assets/cases/`.

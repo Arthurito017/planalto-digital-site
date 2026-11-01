@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  // Número no formato internacional, só dígitos. Ex.: 5561999999999
+  // Número no formato internacional, só dígitos.
   var WHATSAPP = '5561998639747';
 
   var movimentoReduzido = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -47,7 +47,23 @@
   }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
   $$('[data-reveal], [data-split]').forEach(function (el) { observador.observe(el); });
 
-  /* Diagnóstico: o scroll troca a tela do celular */
+  /* Menu do celular */
+  var topo = $('[data-topo]');
+  var menuBotao = $('[data-menu-botao]');
+
+  function alternarMenu(aberto) {
+    topo.classList.toggle('menu-aberto', aberto);
+    menuBotao.setAttribute('aria-expanded', String(aberto));
+    menuBotao.setAttribute('aria-label', aberto ? 'Fechar menu' : 'Abrir menu');
+  }
+  menuBotao.addEventListener('click', function () { alternarMenu(!topo.classList.contains('menu-aberto')); });
+  $$('.topo-nav a').forEach(function (a) { a.addEventListener('click', function () { alternarMenu(false); }); });
+  addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && topo.classList.contains('menu-aberto')) { alternarMenu(false); menuBotao.focus(); }
+  });
+  matchMedia('(min-width: 1001px)').addEventListener('change', function (e) { if (e.matches) alternarMenu(false); });
+
+  /* Primeiro contato: o scroll troca a tela do celular */
   var diag = $('[data-diag]');
   var botoesDiag = $$('[data-passo]');
   var telas = $$('[data-tela]');
@@ -88,12 +104,12 @@
   }
 
   /* Ciclo de scroll */
-  var topo = $('[data-topo]');
   var trilha = $('[data-trilha]');
   var trilhaLuz = $('[data-trilha-luz]');
   var nos = $$('[data-no]');
   var secoes = $$('[data-secao]');
   var camadas = $$('[data-profundidade]');
+  var casos = $$('[data-caso]');
   var rota = $('[data-rota]');
   var rotaLuz = $('[data-rota-luz]');
   var ultimoY = 0;
@@ -106,13 +122,13 @@
     var alto = innerHeight;
 
     topo.classList.toggle('fixado', y > 30);
-    topo.classList.toggle('oculto', y > ultimoY && y > 500);
+    topo.classList.toggle('oculto', y > ultimoY && y > 500 && !topo.classList.contains('menu-aberto'));
     ultimoY = y;
 
     trilhaLuz.style.transform = 'scaleY(' + (total > 0 ? y / total : 0) + ')';
 
     var atual = secoes[0].id;
-    secoes.forEach(function (s) { if (s.getBoundingClientRect().top <= alto * 0.5) atual = s.id; });
+    secoes.forEach(function (s) { if (s.getBoundingClientRect().top <= alto * 0.5) atual = s.dataset.dot || s.id; });
     nos.forEach(function (n) { n.classList.toggle('ativo', n.dataset.no === atual); });
     trilha.classList.toggle('recolhida', atual === 'metodo' && percursoHorizontal > 0);
 
@@ -132,6 +148,13 @@
       });
     }
 
+    if (!movimentoReduzido) {
+      casos.forEach(function (c) {
+        var r = c.getBoundingClientRect();
+        c.style.setProperty('--cp', limitar((alto - r.top) / (alto + r.height), 0, 1).toFixed(3));
+      });
+    }
+
     var rr = rota.getBoundingClientRect();
     rotaLuz.style.strokeDashoffset = String(1 - limitar((alto * 0.85 - rr.top) / (alto * 0.7), 0, 1));
   }
@@ -147,7 +170,7 @@
   addEventListener('load', function () { medirHorizontal(); pedirQuadro(); });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { medirHorizontal(); pedirQuadro(); });
 
-  /* Portfólio: projetos conceito, sempre com clínicas fictícias */
+  /* Antes e depois: projetos conceito, sempre com empresas fictícias */
   var projetos = [
     {
       aba: 'Odontologia', nome: 'Odonto Ipê', tipo: 'Clínica odontológica fictícia · Asa Sul', url: 'odontoipe.exemplo',
@@ -166,12 +189,12 @@
       lista: ['Cada procedimento com página própria e dúvidas frequentes', 'Linguagem cuidadosa, sem promessa de resultado', 'Agendamento pelo WhatsApp com a mensagem pronta']
     },
     {
-      aba: 'Reabilitação oral', nome: 'Clínica Vértice', tipo: 'Clínica odontológica fictícia · Águas Claras', url: 'clinicavertice.exemplo',
-      cores: { fundo: '#F1F0F4', tinta: '#29263A', marca: '#3D3468', acento: '#A99BD0' },
-      titulo: 'Decisões grandes pedem clareza.', texto: 'Tratamentos complexos explicados por etapas, para decidir com segurança.',
-      menu: ['Tratamentos', 'Etapas', 'Avaliação'], rt: 'Responsável técnico: nome · CRO-DF 00000',
-      antigo: ['Clinica Odontologica - Site Oficial', 'Página em construção. Em breve mais informações sobre os nossos tratamentos. Última atualização em 2016.'],
-      lista: ['Jornada do tratamento explicada passo a passo', 'Páginas por especialidade, preparadas para a busca local', 'Credenciais da equipe em destaque']
+      aba: 'Contabilidade', nome: 'Meridiano Contábil', tipo: 'Escritório contábil fictício · Taguatinga', url: 'meridianocontabil.exemplo',
+      cores: { fundo: '#EFF3F6', tinta: '#17222C', marca: '#1D4E6E', acento: '#E0A83A' },
+      titulo: 'Contas em dia, decisões com calma.', texto: 'Contabilidade consultiva explicada sem juridiquês, com atendimento direto pelo WhatsApp.',
+      menu: ['Serviços', 'Equipe', 'Contato'], rt: 'Responsável técnico: nome · CRC-DF 00000',
+      antigo: ['CONTABILIDADE MERIDIANO - BEM VINDOS', 'Prestamos serviços contábeis para pessoas físicas e jurídicas. Entre em contato pelo telefone ou venha nos visitar.'],
+      lista: ['Serviços por regime tributário, explicados com clareza', 'Equipe e registro profissional em destaque', 'Contato direto pelo WhatsApp']
     }
   ];
 
@@ -205,7 +228,7 @@
 
     antes.textContent = '';
     escrever(antes, 'div', p.antigo[0], 'ma-topo');
-    escrever(antes, 'div', 'Início | Clínica | Serviços | Fale Conosco', 'ma-menu');
+    escrever(antes, 'div', 'Início | Empresa | Serviços | Fale Conosco', 'ma-menu');
     var corpoA = escrever(antes, 'div', '', 'ma-corpo');
     escrever(corpoA, 'div', 'foto.jpg', 'ma-foto');
     var textoA = escrever(corpoA, 'div');
@@ -226,11 +249,11 @@
     var textoN = escrever(corpoN, 'div');
     escrever(textoN, 'h4', p.titulo);
     escrever(textoN, 'p', p.texto);
-    escrever(textoN, 'span', 'Agendar pelo WhatsApp', 'mn-botao');
+    escrever(textoN, 'span', 'Falar pelo WhatsApp', 'mn-botao');
     escrever(corpoN, 'div', '', 'mn-foto');
     var rodapeN = escrever(depois, 'div', '', 'mn-rodape');
     escrever(rodapeN, 'span', p.rt);
-    escrever(rodapeN, 'span', 'Clínica fictícia');
+    escrever(rodapeN, 'span', 'Empresa fictícia');
   }
 
   projetos.forEach(function (p, i) {
@@ -266,6 +289,27 @@
       requestAnimationFrame(animar);
     }, { threshold: 0.6 }).observe(area);
   }
+
+  /* Abas de sistemas: empresas e setor público */
+  var abasSis = $$('[data-tabs-sis] [role="tab"]');
+  function mostrarAbaSis(i) {
+    abasSis.forEach(function (b, n) {
+      var ativa = n === i;
+      b.setAttribute('aria-selected', String(ativa));
+      b.tabIndex = ativa ? 0 : -1;
+      $('#' + b.getAttribute('aria-controls')).hidden = !ativa;
+    });
+  }
+  abasSis.forEach(function (b, i) {
+    b.addEventListener('click', function () { mostrarAbaSis(i); });
+    b.addEventListener('keydown', function (e) {
+      var passo = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+      if (!passo) return;
+      var alvo = (i + passo + abasSis.length) % abasSis.length;
+      mostrarAbaSis(alvo);
+      abasSis[alvo].focus();
+    });
+  });
 
   /* Regiões */
   var pontos = $$('[data-cidade]');
@@ -312,21 +356,21 @@
   form.addEventListener('submit', function (e) {
     e.preventDefault();
     var dados = new FormData(form);
-    var faltando = ['nome', 'clinica'].filter(function (k) {
+    var faltando = ['nome', 'empresa'].filter(function (k) {
       var vazio = !String(dados.get(k)).trim();
       form.elements[k].classList.toggle('erro', vazio);
       form.elements[k].setAttribute('aria-invalid', String(vazio));
       return vazio;
     });
     if (faltando.length) {
-      status.textContent = 'Preencha seu nome e o nome da clínica para continuar.';
+      status.textContent = 'Preencha seu nome e o nome da empresa ou órgão para continuar.';
       form.elements[faltando[0]].focus();
       return;
     }
     var site = String(dados.get('site')).trim();
-    var mensagem = 'Olá! Sou ' + String(dados.get('nome')).trim() + ', da clínica ' + String(dados.get('clinica')).trim() +
-      ', em ' + dados.get('cidade') + '. ' + (site ? 'Nosso site atual é ' + site + '. ' : 'Ainda não temos site. ') +
-      'Gostaria de ver um protótipo, sem compromisso.';
+    var mensagem = 'Olá! Sou ' + String(dados.get('nome')).trim() + ', de ' + String(dados.get('empresa')).trim() +
+      '. Preciso de ' + dados.get('interesse') + '. ' + (site ? 'Nosso site atual é ' + site + '. ' : '') +
+      'Gostaria de conversar, sem compromisso.';
     if (!WHATSAPP) {
       status.textContent = 'O número de WhatsApp da Planalto Digital ainda está sendo configurado.';
       return;
