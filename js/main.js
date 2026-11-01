@@ -2,7 +2,7 @@
   'use strict';
 
   // Número no formato internacional, só dígitos. Ex.: 5561999999999
-  var WHATSAPP = '';
+  var WHATSAPP = '5561998639747';
 
   var movimentoReduzido = matchMedia('(prefers-reduced-motion: reduce)').matches;
   var $ = function (s, c) { return (c || document).querySelector(s); };
